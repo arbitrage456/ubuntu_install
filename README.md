@@ -67,7 +67,23 @@ timedatectl show | grep NTP
 3. nfs 설정
 
 ```bash
+sudo apt update
+sudo apt install -y nfs-common
+
+sudo mkdir -p /mnt/nfs
+sudo mount 192.168.88.249:/volume1/arbitrage /mnt/nfs
+
+sudo nano /etc/fstab
 ```
+
+```bash
+192.168.88.249:/volume1/arbitrage /mnt/nfs nfs rw,vers=4,auto,_netdev 0 0
+```
+
+```bash
+sudo mount -a
+```
+
 
 4. nas 화이트 리스트 등록
 
@@ -78,6 +94,10 @@ all user admin?
 5. nodejs 설치
 
 ```bash
+sudo apt update
+sudo apt install -y nodejs npm
+node -v
+npm -v
 
 ```
 
