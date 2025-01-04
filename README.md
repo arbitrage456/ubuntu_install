@@ -114,6 +114,18 @@ git config --list
 
 보안 등록
 ```bash
-ssh-keygen -t rsa -b 4096 -C shycrystal@naver.com
+ssh-keygen -t ed25519 -C shycrystal@naver.com
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+cat ~/.ssh/id_ed25519.pub
+```
+
+출력된거 깃헙 ssh로 등록
+```bash
+cd ~/nodejs/Data_Save
+git remote set-url origin git@github.com:arbitrage456/Data_Save.git
+ssh -T git@github.com
+git pull origin main
+
 ```
 
