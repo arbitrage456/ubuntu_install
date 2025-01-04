@@ -101,3 +101,19 @@ npm -v
 
 ```
 
+6. githumb 설치 (필요 시)
+```bash
+sudo apt update
+sudo apt install git -y
+git --version
+
+git config --global user.name don3030
+git config --global user.email shycrystal@naver.com
+git config --list
+```
+
+보안 등록
+```bash
+ssh-keygen -t rsa -b 4096 -C shycrystal@naver.com
+```
+
