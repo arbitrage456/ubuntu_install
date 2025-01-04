@@ -1,5 +1,7 @@
 # ubuntu_install
 
+1. 인터넷 설정
+
 ```bash
 sudo apt update  
 sudo apt install isc-dhcp-client  
@@ -33,4 +35,26 @@ network:
       link: "enp42s0"
 ```
 
+2. 동기화 설정
+
+```bash
+
+```
+
+3. nfs 설정
+
+```bash
+```
+
+4. nas 화이트 리스트 등록
+
+```bash
+all user admin?
+```
+
+5. nodejs 설치
+
+```bash
+
+```
 
