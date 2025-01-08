@@ -22,10 +22,11 @@ network:
         - 192.168.88.xxx/24  #101=A, 104=D
       dhcp4: false
       dhcp6: false
-  brides:
+  bridges:
     br0:
       dhcp4: true
       dhcp6: false
+      interfaces:
       - vlan50   #스위칭허브 id
   vlans:
     vlan50:
