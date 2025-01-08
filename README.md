@@ -129,3 +129,88 @@ git pull origin main
 
 ```
 
+쿠버네티스 설치 (설치만 해당, 방화벽 설정, 워커노드, 마스터노드 설정은 개별)
+```
+#!/bin/bash
+
+# Exit immediately if a command exits with a non-zero status
+set -e
+
+# Update and upgrade packages
+sudo apt update
+sudo apt upgrade -y
+
+# Disable swap for better performance
+sudo swapoff -a
+sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+# Load kernel modules for containerd and Kubernetes
+sudo tee /etc/modules-load.d/containerd.conf <<EOF
+overlay
+br_netfilter
+EOF
+sudo modprobe overlay
+sudo modprobe br_netfilter
+
+# Configure sysctl for Kubernetes networking
+sudo tee /etc/sysctl.d/kubernetes.conf <<EOF
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
+EOF
+
+# Reload sysctl settings
+sudo sysctl --system
+
+# Install required tools and CA certificates
+sudo apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates
+
+# Add Docker repository and install containerd
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmour -o /etc/apt/trusted.gpg.d/docker.gpg
+sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+sudo apt update
+sudo apt install -y containerd.io
+
+# Configure containerd
+containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1
+sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/g' /etc/containerd/config.toml
+sudo systemctl restart containerd
+sudo systemctl enable containerd
+
+# Add Kubernetes repository
+sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+sudo mkdir -p -m 755 /etc/apt/keyrings
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+
+# Install Kubernetes components
+sudo apt-get update
+sudo apt-get install -y kubelet kubeadm kubectl
+
+# Enable Kubernetes components to start on boot
+sudo systemctl enable kubelet
+
+# Automatically handle deferred service restarts
+sudo needrestart -r a || true
+```
+
+
+마스터노드 설정할 때만 해당 (마스터 노드 네트워크 설정)
+```
+# Print completion message
+echo "Kubernetes setup completed successfully!"
+
+sudo kubeadm init --pod-network-cidr=192.168.0.0/16
+
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+sudo chmod 644 /etc/kubernetes/admin.conf
+
+kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+```
+
+
+
+
