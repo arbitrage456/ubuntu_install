@@ -36,6 +36,10 @@ network:
       link: "enp42s0"
 ```
 
+```bash
+sudo netplan apply
+```
+
 2. 동기화 설정
 
 ```bash
