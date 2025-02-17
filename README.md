@@ -219,3 +219,28 @@ kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
 
 
 
+
+```
+sudo apt update
+sudo apt install openssh-server
+
+sudo systemctl enable ssh
+sudo systemctl start ssh
+
+sudo nano /etc/ssh/sshd_config
+접근해서 아래 내용 주석해제
+PasswordAuthentication yes
+
+sudo systemctl restart ssh
+sudo ufw allow ssh
+sudo ufw enable
+```
+
+vscode 플러그인 설치
+Remote - SSH
+컨트롤 + shift + p -> Tunnels/SSH
+Add New ssh host
+ssh {pc유저이름}@{아이피} -A
+
+
+
