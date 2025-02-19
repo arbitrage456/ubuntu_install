@@ -236,11 +236,11 @@ sudo ufw allow ssh
 sudo ufw enable
 ```
 
-vscode 플러그인 설치
-Remote - SSH
-컨트롤 + shift + p -> Tunnels/SSH
-Add New ssh host
-ssh {pc유저이름}@{아이피} -A
+vscode 플러그인 설치  
+Remote - SSH  
+컨트롤 + shift + p -> Tunnels/SSH  
+Add New ssh host  
+ssh {pc유저이름}@{아이피} -A  
 
 
 
