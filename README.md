@@ -242,5 +242,30 @@ Remote - SSH
 Add New ssh host  
 ssh {pc유저이름}@{아이피} -A  
 
+### ssh OTP 등록하기
+```
+sudo apt update && sudo apt install libpam-google-authenticator -y
+google-authenticator
+```
+모두 y 체크 후 엔터하면 QR 코드가 나옴. 그거 스캔
+
+```
+sudo nano /etc/pam.d/sshd
+
+# 아래 줄 추가 아무데나 추가하면 됨.
+auth required pam_google_authenticator.so
+
+sudo nano /etc/ssh/sshd_config
+# 아래 설정 주석 해제 및 추가
+ChallengeResponseAuthentication yes
+AuthenticationMethods keyboard-interactive
+
+# 파일 저장 후 ssh 다시 실행
+sudo systemctl restart ssh
+```
+
+
+
+
 
 
