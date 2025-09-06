@@ -134,33 +134,6 @@ git pull origin main
 
 ```
 
-우분투 ssh + otp
-```bash
-# 1. 패키지 업데이트
-sudo apt update && sudo apt upgrade -y
-
-# 2. Google Authenticator PAM 모듈 설치
-sudo apt install libpam-google-authenticator -y
-
-# 3. OTP 초기화 (SSH 접속할 사용자 계정으로 실행)
-google-authenticator
-
-# 4. PAM 설정에 OTP 모듈 추가
-sudo sed -i '1iauth required pam_google_authenticator.so' /etc/pam.d/sshd
-
-# 5. SSH 설정 변경
-sudo sed -i 's/^#\?ChallengeResponseAuthentication.*/ChallengeResponseAuthentication yes/' /etc/ssh/sshd_config
-sudo sed -i 's/^#\?UsePAM.*/UsePAM yes/' /etc/ssh/sshd_config
-echo "AuthenticationMethods password,keyboard-interactive" | sudo tee -a /etc/ssh/sshd_config
-
-# 6. SSH 서비스 재시작
-sudo systemctl restart ssh
-
-# 7. 방화벽에서 SSH 포트 허용 (이미 되어있다면 건너뜀)
-sudo ufw allow 22/tcp
-sudo ufw reload
-
-```
 
 
 
@@ -267,31 +240,68 @@ sudo ufw allow ssh
 sudo ufw enable
 ```
 
+
 vscode 플러그인 설치  
 Remote - SSH  
 컨트롤 + shift + p -> Tunnels/SSH  
 Add New ssh host  
 ssh {pc유저이름}@{아이피} -A  
 
+접속pc C:\Users\<사용자>\.ssh\config
+```
+Host 210.179.18.49
+  HostName 210.179.18.49
+  User b1
+  Port 22
+  PreferredAuthentications keyboard-interactive
+```
+
+crtrl+shift+p -> user setting json 
+```
+{
+  "remote.SSH.showLoginTerminal": true,
+  "remote.SSH.permitPtyAllocation": true,
+  "remote.SSH.remotePlatform": { 
+    "210.179.18.49": "linux",
+    "192.168.88.106": "linux",
+    "192.168.88.107": "linux"
+  },
+  "remote.SSH.useExecServer": false,
+  "remote.SSH.useLocalServer": true
+}
+
+```
+
+
 ### ssh OTP 등록하기
 ```
-sudo apt update && sudo apt install libpam-google-authenticator -y
+sudo apt update
+sudo apt install openssh-server -y
+sudo systemctl enable --now ssh
+sudo apt install libpam-google-authenticator -y
 google-authenticator
 ```
 모두 y 체크 후 엔터하면 QR 코드가 나옴. 그거 스캔
 
 ```
 sudo nano /etc/pam.d/sshd
-
-# 아래 줄 추가 아무데나 추가하면 됨.
+```
+```
+# 순서대로 상단 2개
+@include common-auth
 auth required pam_google_authenticator.so
-
+```
+```
 sudo nano /etc/ssh/sshd_config
-# 아래 설정 주석 해제 및 추가
-ChallengeResponseAuthentication yes
+```
+```
+UsePAM yes
+KbdInteractiveAuthentication yes
+PasswordAuthentication no
 AuthenticationMethods keyboard-interactive
+```
 
-# 파일 저장 후 ssh 다시 실행
+```
 sudo systemctl restart ssh
 ```
 
