@@ -134,6 +134,37 @@ git pull origin main
 
 ```
 
+우분투 ssh + otp
+```bash
+# 1. 패키지 업데이트
+sudo apt update && sudo apt upgrade -y
+
+# 2. Google Authenticator PAM 모듈 설치
+sudo apt install libpam-google-authenticator -y
+
+# 3. OTP 초기화 (SSH 접속할 사용자 계정으로 실행)
+google-authenticator
+
+# 4. PAM 설정에 OTP 모듈 추가
+sudo sed -i '1iauth required pam_google_authenticator.so' /etc/pam.d/sshd
+
+# 5. SSH 설정 변경
+sudo sed -i 's/^#\?ChallengeResponseAuthentication.*/ChallengeResponseAuthentication yes/' /etc/ssh/sshd_config
+sudo sed -i 's/^#\?UsePAM.*/UsePAM yes/' /etc/ssh/sshd_config
+echo "AuthenticationMethods password,keyboard-interactive" | sudo tee -a /etc/ssh/sshd_config
+
+# 6. SSH 서비스 재시작
+sudo systemctl restart ssh
+
+# 7. 방화벽에서 SSH 포트 허용 (이미 되어있다면 건너뜀)
+sudo ufw allow 22/tcp
+sudo ufw reload
+
+```
+
+
+
+
 쿠버네티스 설치 (설치만 해당, 방화벽 설정, 워커노드, 마스터노드 설정은 개별)
 ```
 #!/bin/bash
