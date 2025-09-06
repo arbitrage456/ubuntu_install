@@ -27,7 +27,7 @@ network:
       dhcp4: true
       dhcp6: false
       interfaces:
-      - vlan50   #스위칭허브 id
+        - vlan50   #스위칭허브 id
   vlans:
     vlan50:
       dhcp4: false
